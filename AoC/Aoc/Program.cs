@@ -7,7 +7,7 @@ namespace Aoc
 	{
 		static void Main(string[] args)
 		{
-			var solvers = new List<IPuzzleSolver> { new Year2019.Day1.Solver() };
+			var solvers = new List<IPuzzleSolver> { new Year2019.Day1.Solver(), new Year2019.Day2.Solver() };
 
 			foreach(var solver in solvers)
 			{
