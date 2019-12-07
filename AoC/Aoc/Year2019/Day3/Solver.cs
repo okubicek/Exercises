@@ -5,13 +5,14 @@ using System.Linq;
 
 namespace Aoc.Year2019.Day3
 {
+	[Aoc(Day = Day)]
 	public class Solver : IPuzzleSolver
 	{
 		private Dictionary<string, int> _firstCablePath = new Dictionary<string, int>();
 		private Dictionary<string, int> _secondCablePath = new Dictionary<string, int>();
 		private HashSet<string> _intersections = new HashSet<string>();
 
-		public int Day => 3;
+		private const int Day = 3;
 
 		public Solver()
 		{

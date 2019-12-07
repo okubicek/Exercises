@@ -1,8 +1,9 @@
 ﻿namespace Aoc.Year2019.Day4
 {
+	[Aoc(Day = Day)]
 	public class Solver : IPuzzleSolver
 	{
-		public int Day => 4;
+		private const int Day = 4;
 
 		private int _min = 254032;
 		private int _max = 789860;

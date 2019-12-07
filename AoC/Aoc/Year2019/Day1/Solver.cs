@@ -3,16 +3,17 @@ using System.Linq;
 
 namespace Aoc.Year2019.Day1
 {
+	[Aoc(Day = Day)]
 	public class Solver : IPuzzleSolver
 	{
 		private List<string> Input { get; }
 
+		private const int Day = 1;
+
 		public Solver()
 		{
-			Input = InputFileReader.GetInput(@"Year2019/Inputs/Day1.txt");
-		}
-
-		public int Day => 1;
+			Input = InputFileReader.GetInput($"Year2019/Inputs/Day{Day}.txt");
+		}		
 
 		public string SolveFirstTask()
 		{
