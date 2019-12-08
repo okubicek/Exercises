@@ -17,7 +17,11 @@ namespace Aoc.Year2019.Day2
 
 		public string SolveFirstTask()
 		{
-			var inputs = PopulateMemory(12, 2);
+			var inputs = Input.Split(',').Select(x => int.Parse(x)).ToList();
+			inputs[1] = 12;
+			inputs[2] = 2;
+
+			PopulateMemory(inputs);
 
 			return inputs[0].ToString();
 		}
@@ -28,8 +32,12 @@ namespace Aoc.Year2019.Day2
 			{
 				for (int j = 0; j <= 99; j++)
 				{
-					var res = PopulateMemory(i, j);
-					if (res[0] == 19690720)
+					var inputs = Input.Split(',').Select(x => int.Parse(x)).ToList();
+					inputs[1] = i;
+					inputs[2] = j;
+
+					PopulateMemory(inputs);
+					if (inputs[0] == 19690720)
 					{
 						return (i * 100 + j).ToString();
 					}
@@ -39,11 +47,8 @@ namespace Aoc.Year2019.Day2
 			throw new System.ApplicationException($"No solution found");
 		}
 
-		private List<int> PopulateMemory(int noun, int verb)
+		private void PopulateMemory(List<int> inputs)
 		{
-			var inputs = Input.Split(',').Select(x => int.Parse(x)).ToList();
-			inputs[1] = noun;
-			inputs[2] = verb;
 			var length = inputs.Count;
 
 			var iterationCount = 0;
@@ -55,8 +60,6 @@ namespace Aoc.Year2019.Day2
 				inputs[inputs[x + 3]] = ProcessOpcode(inputs[x], firstParam, secondParam);
 				iterationCount++;
 			}
-
-			return inputs;
 		}
 
 		public int ProcessOpcode(int opcode, int firstParam, int secondParam)
