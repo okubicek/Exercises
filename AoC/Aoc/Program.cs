@@ -6,7 +6,7 @@ namespace Aoc
 	{
 		static void Main(string[] args)
 		{
-			var dayToRun = 8;
+			var dayToRun = 7;
 			var solver = new PuzzleSolverFactory().GetSolver(2019, dayToRun);
 
 			SolveTask(solver, 1);

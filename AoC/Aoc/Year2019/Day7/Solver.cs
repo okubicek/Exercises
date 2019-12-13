@@ -22,7 +22,7 @@ namespace Aoc.Year2019.Day7
 		}
 
 		public string SolveFirstTask()
-		{
+		{		
 			var phaseCombinations = GetAllPossibleStringCombinations(new List<string> { "0", "1", "2", "3", "4" });
 			var results = new Dictionary<int, string>();
 
@@ -98,25 +98,45 @@ namespace Aoc.Year2019.Day7
 			return results.Select(x => x.Key).Max().ToString();
 		}
 
-		private int GetOutputToThrustersWithFeedback(string phase)
+		private int GetOutputToThrustersWithFeedback(string phases)
 		{
-			var inputChannels = new List<IInputChannel>();
+			var inputChannels = new List<InputChannel>();
+			var outputChannels = new List<IOutputChannel>();
+
+			var firstInputChannel = new InputChannel();
+			var max = 5;
+
+			for (var i = 0; i < max; i++)
+			{
+				firstInputChannel.QueueInput(int.Parse(phases.Substring(i, 1)));
+				if (i == 0)
+				{
+					firstInputChannel.QueueInput(0);
+				}
+
+				var secondInputChannel = new InputChannel();
+				var outputChannel = new LinkedOutputChannel(i == max - 1 ? inputChannels[0] : secondInputChannel);
+
+				inputChannels.Add(firstInputChannel);
+				outputChannels.Add(outputChannel);
+
+				firstInputChannel = secondInputChannel;
+			}
+
 			var tasks = new List<Task>();
 
-			var inputChannel = new InputChannel();
-
-			for (var i = 0; i < 5; i++)
+			for (var j = 0; j < max; j++)
 			{
-				inputChannel.QueueInput(i);
-				var outputChannel = new LinkedOutputChannel(inputChannel);
-
-				inputChannels.Add(inputChannel);
+				var input = inputChannels[j];
+				var output = outputChannels[j];
 
 				var t = Task.Run(() =>
 				{
-					var computer = new OpCodeComputer.OpCodeComputer(inputChannel, outputChannel);
+					var computer = new OpCodeComputer.OpCodeComputer(input, output);
 					computer.ProcessInstructions(Program);
 				});
+
+				tasks.Add(t);
 			}
 
 			Task.WaitAll(Task.WhenAll(tasks));
