@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Aoc.Year2019.OpCodeComputer
 {
@@ -81,7 +82,7 @@ namespace Aoc.Year2019.OpCodeComputer
 					_memory[_memory[ptr + 1]] = _input.GetNext();
 					return ptr + 2;
 				case 4:
-					Console.WriteLine($"Output: {GetValueByMode(nounMode, _memory[ptr + 1])}");
+					_output.Send(GetValueByMode(nounMode, _memory[ptr + 1]));
 					return ptr + 2;
 				case 5:
 					if (GetValueByMode(nounMode, _memory[ptr + 1]) != 0)
