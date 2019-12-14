@@ -11,7 +11,7 @@ namespace Aoc.Year2019.Day7
 			_input = input;
 		}
 
-		public void Send(int val)
+		public void Send(long val)
 		{
 			_input.QueueInput(val);
 		}

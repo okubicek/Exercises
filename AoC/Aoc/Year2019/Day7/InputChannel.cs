@@ -1,24 +1,23 @@
 ﻿using Aoc.Year2019.OpCodeComputer;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace Aoc.Year2019.Day7
 {
 	public class InputChannel : IInputChannel
 	{
-		private BlockingCollection<int> _queue;
+		private BlockingCollection<long> _queue;
 
 		public InputChannel()
 		{
-			_queue = new BlockingCollection<int>();
+			_queue = new BlockingCollection<long>();
 		}
 
-		public int GetNext()
+		public long GetNext()
 		{
 			return _queue.Take();
 		}
 
-		public void QueueInput(int input)
+		public void QueueInput(long input)
 		{
 			_queue.Add(input);
 		}

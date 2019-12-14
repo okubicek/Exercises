@@ -2,6 +2,6 @@
 {
 	public interface IOutputChannel
 	{
-		void Send(int val);
+		void Send(long val);
 	}
 }

@@ -11,7 +11,7 @@ namespace Aoc.Year2019.Day7
 			_output = output;
 		}
 
-		public void Send(int val)
+		public void Send(long val)
 		{
 			_output.Value = val;
 		}

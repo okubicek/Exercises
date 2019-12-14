@@ -1,5 +1,4 @@
 ﻿using Aoc.Year2019.OpCodeComputer;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,13 +10,13 @@ namespace Aoc.Year2019.Day7
 	{
 		private const int Day = 7;
 
-		private List<int> Program;
+		private List<long> Program;
 
 		public Solver()
 		{
 			Program = InputFileReader.GetInput($"Year2019/Inputs/Day{Day}.txt")[0]
 				.Split(',')
-				.Select(x => int.Parse(x))
+				.Select(x => long.Parse(x))
 				.ToList();
 		}
 
@@ -80,7 +79,7 @@ namespace Aoc.Year2019.Day7
 				computer.ProcessInstructions(Program);
 			}
 
-			return output.Value;
+			return (int)output.Value;
 		}
 
 		public string SolveSecondTask()
@@ -141,7 +140,7 @@ namespace Aoc.Year2019.Day7
 
 			Task.WaitAll(Task.WhenAll(tasks));
 
-			return inputChannels.First().GetNext();
+			return (int) inputChannels.First().GetNext();
 		}
 	}
 }

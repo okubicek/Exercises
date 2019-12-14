@@ -5,7 +5,7 @@ namespace Aoc.Year2019.Day5
 {
 	public class OutputChannel : IOutputChannel
 	{
-		public void Send(int val)
+		public void Send(long val)
 		{
 			Console.WriteLine($"Output: {val}");
 		}

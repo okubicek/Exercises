@@ -1,7 +1,7 @@
 ﻿using Aoc.Year2019.OpCodeComputer;
 using System.Collections.Generic;
 
-namespace Aoc.Year2019.Day5
+namespace Aoc.Year2019.Day9
 {
 	public class InputChannel : IInputChannel
 	{

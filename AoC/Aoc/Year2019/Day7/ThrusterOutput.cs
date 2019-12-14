@@ -6,11 +6,11 @@ namespace Aoc.Year2019.Day7
 {
 	public class ThrusterOutput
 	{
-		public ThrusterOutput(int val)
+		public ThrusterOutput(long val)
 		{
 			Value = val;
 		}
 
-		public int Value { get; set; }
+		public long Value { get; set; }
 	}
 }

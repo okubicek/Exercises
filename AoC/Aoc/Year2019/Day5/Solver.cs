@@ -9,7 +9,7 @@ namespace Aoc.Year2019.Day5
 	{
 		private const int Day = 5;
 
-		private List<int> InputInstructions;
+		private List<long> InputInstructions;
 
 		public Solver()
 		{
@@ -35,7 +35,7 @@ namespace Aoc.Year2019.Day5
 		{
 			InputInstructions = InputFileReader.GetInput($"Year2019/Inputs/Day{Day}.txt")[0]
 				.Split(',')
-				.Select(x => int.Parse(x))
+				.Select(x => long.Parse(x))
 				.ToList();
 		}
 

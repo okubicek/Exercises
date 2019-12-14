@@ -2,6 +2,6 @@
 {
 	public interface IInputChannel
 	{
-		int GetNext();
+		long GetNext();
 	}
 }
