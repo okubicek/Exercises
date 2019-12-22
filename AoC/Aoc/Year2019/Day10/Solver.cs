@@ -10,61 +10,77 @@ namespace Aoc.Year2019.Day10
 	{
 		private const int Day = 10;
 
-		private const decimal Undefined = decimal.MaxValue;
-
-		private List<string> AsteroidMap { get; set; }
+		private List<char[]> AsteroidMap { get; set; }
 
 		public Solver()
 		{
-			AsteroidMap = InputFileReader.GetInput($"Year2019/Inputs/Day{Day}.txt");
+			AsteroidMap = InputFileReader
+				.GetInput($"Year2019/Inputs/Day{Day}.txt")
+				.Select(x => x.ToCharArray())
+				.ToList();
 		}
 
 		public string SolveFirstTask()
 		{
+			var stationDetails = DetermineStationPosition();
+
+			return stationDetails.visibleAsteroids.ToString();
+		}
+
+		private (Point coordinates, int visibleAsteroids) DetermineStationPosition()
+		{
 			var xSize = AsteroidMap.First().Length;
 			var ySize = AsteroidMap.Count;
 
-			var asteroidCounts = new List<int>();
+			var asteroidCounts = new Dictionary<Point, int>();
 
-			for (int x = 0; x < xSize; x++)
+			for (int y = 0; y < ySize; y++)
 			{
-				for (int y = 0; y < ySize; y++)
+				for (int x = 0; x < xSize; x++)
 				{
 					if (IsBlankSpace(AsteroidMap[y][x])) continue;
 
 					var stationCoordinates = new Point(x, y);
-					var visibleAsteroidsCount = CountVisibleAsteroids(stationCoordinates, xSize, ySize);
+					var closestAsteroids = DetermineClosestAsteroids(stationCoordinates, xSize, ySize);
 
-					asteroidCounts.Add(visibleAsteroidsCount);
+					asteroidCounts.TryAdd(stationCoordinates, closestAsteroids.Count);
 				}
 			}
 
-			return asteroidCounts.Max().ToString();
+			var max = asteroidCounts.Select(x => x.Value).Max();
+			var coordinate = asteroidCounts.Where(x => x.Value == max).First();
+			return (coordinate.Key, max);
 		}
 
-		public int CountVisibleAsteroids(Point stationCoordinates, int searchedSpaceXSize, int searchedSpaceYSize)
+		public List<(decimal angle, Point coordinates, decimal distance)> DetermineClosestAsteroids(Point stationCoordinates, int searchedSpaceXSize, int searchedSpaceYSize)
 		{
-			var angles = new List<HashSet<decimal>> { new HashSet<decimal>(), new HashSet<decimal>() };
+			var angles = new Dictionary<decimal, (Point coordinates, decimal distance)>();
 
-			for (int x = 0; x < searchedSpaceXSize; x++)
+			for (int y = 0; y < searchedSpaceYSize; y++)
 			{
-				for (int y = 0; y < searchedSpaceYSize; y++)
+				for (int x = 0; x < searchedSpaceXSize; x++)
 				{
 					if (IsBlankSpace(AsteroidMap[y][x]) || IsItself(ref stationCoordinates, x, y)) continue;
 
 					var distanceToAsteroid = new Size(
 							x - stationCoordinates.X,
-							y - stationCoordinates.Y
+							stationCoordinates.Y - y
 						);
 
-					decimal angle = CalculateAngleToAsteroid(distanceToAsteroid);
+					var (angle, absoluteDistance) = CalculateAngleAndDistanceToAsteroid(distanceToAsteroid);
+					angle = Math.Round(angle, 5, MidpointRounding.AwayFromZero);
 
-					var position = distanceToAsteroid.Height < 0 ? 0 : 1;
-					angles[position].Add(angle);
+					var currentAsteroid = (new Point(x, y), absoluteDistance);
+					if (!angles.TryAdd(angle, currentAsteroid))
+					{
+						angles[angle] = angles[angle].distance > absoluteDistance ? currentAsteroid : angles[angle];						
+					}
 				}
 			}
 
-			return angles[0].Count + angles[1].Count;
+			return angles
+				.Select(x => (x.Key, x.Value.coordinates, x.Value.distance))
+				.ToList();
 		}
 
 		private static bool IsItself(ref Point stationCoordinates, int x, int y)
@@ -77,16 +93,68 @@ namespace Aoc.Year2019.Day10
 			return v != '#';
 		}
 
-		private static decimal CalculateAngleToAsteroid(Size distanceToAsteroid)
+		private static (decimal radius, decimal distance) CalculateAngleAndDistanceToAsteroid(Size distanceToAsteroid)
 		{
-			return distanceToAsteroid.Height == 0
-				? Undefined // this is for undefined
-				: (decimal)distanceToAsteroid.Width / distanceToAsteroid.Height;
+			int quadrant = DetermineQuadrant(distanceToAsteroid);
+
+			var c = (decimal) Math.Sqrt(Math.Pow(distanceToAsteroid.Height, 2) + Math.Pow(distanceToAsteroid.Width, 2));
+
+			switch(quadrant)
+			{
+				case 0:
+				case 2:
+					return (Math.Abs(distanceToAsteroid.Width) / c + quadrant, c);
+				case 1:
+				case 3:
+					return (Math.Abs(distanceToAsteroid.Height) / c + quadrant, c );
+			}
+
+			throw new NotImplementedException("Invalid quadrant");
+		}
+
+		private static int DetermineQuadrant(Size distanceToAsteroid)
+		{
+			if (distanceToAsteroid.Width >= 0 && distanceToAsteroid.Height >= 0) return 0;
+			if (distanceToAsteroid.Width >= 0 && distanceToAsteroid.Height < 0) return 1;
+			if (distanceToAsteroid.Width < 0 && distanceToAsteroid.Height <= 0) return 2;			
+
+			return 3;
 		}
 
 		public string SolveSecondTask()
 		{
-			return string.Empty;
+			var xSize = AsteroidMap.First().Length;
+			var ySize = AsteroidMap.Count;
+
+			var stationDetails = DetermineStationPosition();
+
+			var asteroids = DetermineClosestAsteroids(stationDetails.coordinates, xSize, ySize);
+			Point winner = new Point();
+			var count = 1;
+
+			while(asteroids.Any())
+			{
+				asteroids = asteroids.OrderBy(x => x.angle).ToList();
+				foreach (var asteroid in asteroids)
+				{
+					if (count == 200)
+					{
+						winner = asteroid.coordinates;
+					}
+
+					ZapAsteroidWithLaser(asteroid.coordinates);
+					count++;
+				}
+
+				asteroids = DetermineClosestAsteroids(stationDetails.coordinates, xSize, ySize);
+			}
+
+			return (winner.X * 100 + winner.Y).ToString();
+		}
+
+		private void ZapAsteroidWithLaser(Point coordinates)
+		{
+			AsteroidMap[coordinates.Y][coordinates.X] = '.';
 		}
 	}
 }
