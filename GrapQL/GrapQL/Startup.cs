@@ -20,9 +20,12 @@ namespace GrapQL
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<LessonSchema>();
-            services.AddScoped<Queries>();
+            services.AddSingleton<LessonSchema>();
+            services.AddSingleton<Queries>();
             services.AddScoped<ILessonRepository, LessonRepository>();
+            services.AddScoped<ITeacherRepository, TeacherRepository>();
+            services.AddSingleton<LessonType>();
+            services.AddSingleton<TeacherType>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

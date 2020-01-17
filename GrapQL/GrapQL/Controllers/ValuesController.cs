@@ -20,7 +20,7 @@ namespace GraphQL.Controllers
         public async Task<ActionResult> Post([FromBody] GraphQLQuery query)
         {
             var result = await new DocumentExecuter().ExecuteAsync( x => {
-                x.Schema = _schema.Schema;
+                x.Schema = _schema;
                 x.Query = query.Query;
                 x.OperationName = query.OperationName;
                 x.Inputs = query.Variables.ToInputs();

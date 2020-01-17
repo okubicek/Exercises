@@ -1,34 +1,32 @@
 using System.Collections.Generic;
 using GraphQL.Models;
+using GraphQL.Types;
 
 namespace GraphQL.Queries
 {
     [GraphQLMetadata("Query")]
-    public class Queries //: ObjectGraphType
+    public class Queries : ObjectGraphType
     {
-        // private ILessonRepository _repo;
+        private ILessonRepository _repo;
 
-        // public Queries(ILessonRepository repo)
-        // {            
-        //     _repo = repo;
-        // }
+        public Queries(ILessonRepository lessonRepo, ITeacherRepository teacherRepo)
+        {            
+            _repo = lessonRepo;
+            Field<ListGraphType<LessonType>>(
+                "lessons",
+                resolve : context => lessonRepo.GetAll()
+            );
 
-        [GraphQLMetadata("lessons")]
-        public IEnumerable<Lesson> GetLessons()
-        {
-            return new LessonRepository().GetAll();
-        }
+            Field<LessonType>(
+                "lesson",
+                arguments : new QueryArguments(new QueryArgument<IntGraphType>{ Name = "id" }),
+                resolve : context => lessonRepo.GetById(context.GetArgument<int>("id"))
+            );
 
-        [GraphQLMetadata("lesson")]
-        public Lesson GetLesson(int id)
-        {
-            return null;//_repo.GetById(id);
-        }
-
-        [GraphQLMetadata("teachers")]
-        public IEnumerable<Teacher> GetTeachers()
-        {
-            return null;
+            Field<ListGraphType<TeacherType>>(
+                "teachers",
+                resolve : context => teacherRepo.GetAll()
+            );
         }
     }
 }

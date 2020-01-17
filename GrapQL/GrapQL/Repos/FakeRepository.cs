@@ -6,7 +6,14 @@ public interface ILessonRepository
 {
     IEnumerable<Lesson> GetAll();
 
-    Lesson GetById(int id);    
+    Lesson GetById(int id);
+}
+
+public interface ITeacherRepository
+{
+    IEnumerable<Teacher> GetAll();
+
+    Teacher GetById(int id);
 }
 
 public class LessonRepository : ILessonRepository
@@ -20,6 +27,22 @@ public class LessonRepository : ILessonRepository
     }
 
     public Lesson GetById(int id)
+    {
+        return GetAll().First(x => x.Id == id);
+    }
+}
+
+public class TeacherRepository : ITeacherRepository
+{
+    public IEnumerable<Teacher> GetAll()
+    {
+        return new List<Teacher> {
+            new Teacher { FirstName = "On", SecondName = "Kub" },
+            new Teacher { FirstName = "First", SecondName = "Second" }
+        };
+    }
+
+    public Teacher GetById(int id)
     {
         return GetAll().First(x => x.Id == id);
     }
