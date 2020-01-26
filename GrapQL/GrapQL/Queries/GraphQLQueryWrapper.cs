@@ -5,27 +5,24 @@ using GraphQL.Types;
 namespace GraphQL.Queries
 {
     [GraphQLMetadata("Query")]
-    public class Queries : ObjectGraphType
+    public class GraphQLQueryWrapper : ObjectGraphType
     {
-        private ILessonRepository _repo;
-
-        public Queries(ILessonRepository lessonRepo, ITeacherRepository teacherRepo)
+        public GraphQLQueryWrapper(IDependencyResolver resolver)
         {            
-            _repo = lessonRepo;
             Field<ListGraphType<LessonType>>(
                 "lessons",
-                resolve : context => lessonRepo.GetAll()
+                resolve : context => resolver.Resolve<ILessonRepository>().GetAll()
             );
 
             Field<LessonType>(
                 "lesson",
                 arguments : new QueryArguments(new QueryArgument<IntGraphType>{ Name = "id" }),
-                resolve : context => lessonRepo.GetById(context.GetArgument<int>("id"))
+                resolve : context => resolver.Resolve<ILessonRepository>().GetById(context.GetArgument<int>("id"))
             );
 
             Field<ListGraphType<TeacherType>>(
                 "teachers",
-                resolve : context => teacherRepo.GetAll()
+                resolve : context => resolver.Resolve<ITeacherRepository>().GetAll()
             );
         }
     }

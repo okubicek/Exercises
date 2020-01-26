@@ -1,4 +1,5 @@
 ﻿using GraphiQl;
+using GraphQL;
 using GraphQL.Queries;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,12 +21,14 @@ namespace GrapQL
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IDependencyResolver>(dep => new FuncDependencyResolver(dep.GetRequiredService));
             services.AddSingleton<LessonSchema>();
-            services.AddSingleton<Queries>();
-            services.AddScoped<ILessonRepository, LessonRepository>();
-            services.AddScoped<ITeacherRepository, TeacherRepository>();
+            services.AddSingleton<GraphQLQueryWrapper>();
+            services.AddTransient<ILessonRepository, LessonRepository>();
+            services.AddTransient<ITeacherRepository, TeacherRepository>();
             services.AddSingleton<LessonType>();
-            services.AddSingleton<TeacherType>();
+            services.AddSingleton<TeacherType>();            
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

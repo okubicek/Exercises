@@ -21,7 +21,7 @@ public class LessonRepository : ILessonRepository
     public IEnumerable<Lesson> GetAll()
     {
         return new List<Lesson> { 
-            new Lesson { Name = "lesson", Id = 1, Teacher = new Teacher { FirstName = "On", SecondName = "Kub" } },
+            new Lesson { Name = "lesson", Id = 1, Teacher = new Teacher { Id = 1, FirstName = "On", SecondName = "Kub" } },
             new Lesson { Name = "lesson2", Id = 3 }
          };
     }
@@ -37,13 +37,13 @@ public class TeacherRepository : ITeacherRepository
     public IEnumerable<Teacher> GetAll()
     {
         return new List<Teacher> {
-            new Teacher { FirstName = "On", SecondName = "Kub" },
-            new Teacher { FirstName = "First", SecondName = "Second" }
+            new Teacher { Id = 1, FirstName = "On", SecondName = "Kub" },
+            new Teacher { Id = 2, FirstName = "First", SecondName = "Second" }
         };
     }
 
     public Teacher GetById(int id)
     {
-        return GetAll().First(x => x.Id == id);
+        return GetAll().FirstOrDefault(x => x.Id == id);
     }
 }

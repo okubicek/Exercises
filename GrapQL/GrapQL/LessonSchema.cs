@@ -1,14 +1,13 @@
-using System;
+using GraphQL;
 using GraphQL.Queries;
 using GraphQL.Types;
-using Microsoft.Extensions.DependencyInjection;
 
 public class LessonSchema : Schema
 {
     public LessonSchema(
-        IServiceProvider provider) : base(provider)
+        IDependencyResolver resolver) : base(resolver)
     {
-        Query = provider.GetRequiredService<Queries>();
+        Query = resolver.Resolve<GraphQLQueryWrapper>();
     }
 
     // public ISchema Schema {get; private set;}
