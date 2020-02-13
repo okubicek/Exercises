@@ -22,14 +22,28 @@ ul {
 }
 .buttons {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   text-align: center;
 }
 button {
-  margin: 0.6em auto;
+  margin: 0.3em auto;
   font-size: 1.5em;
   display: block;
+  border: 0;
+  color: white;
+  background: none;
+  box-shadow: none;
+  border-radius: 20%;
 }
-.error {
+button.error{
+  background-color: red;
+}
+
+button.normal{
+  background-color: limegreen;
+}
+
+p.error {
   color: red;
 }
