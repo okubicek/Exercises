@@ -5,10 +5,13 @@ import * as authorActions from "../../redux/actions/authorActions";
 import PropTypes from 'prop-types';
 import CourseForm from "./CourseForm";
 import { newCourse } from "../../../tools/mockData";
+import Spinner from "../common/Spinner"
+import { toast } from "react-toastify";
 
 function ManageCoursePage(props){
     const [course, setCourse] = useState({...props.course});
     const [errors, setErrors] = useState({});
+    const [saving, setSaving] = useState(false);
     
     useEffect(() => {
         const {courses, authors, loadAuthors, loadCourses } = props;
@@ -26,7 +29,19 @@ function ManageCoursePage(props){
         } else {
             setCourse({...props.course});
         }
-    }, [props.course]);    
+    }, [props.course]);
+
+    function formIsValid(){
+        const {title, authorId, category } = course;
+        const errors = {};
+
+        if (!title) errors.title = "Title is required";
+        if (!authorId) errors.author = "Author is required";
+        if (!category) errors.category = "Category is required";
+
+        setErrors(errors);
+        return Object.keys(errors).length === 0;
+    }
 
     function handleChange(event){
         const{ name, value } = event.target;
@@ -36,23 +51,31 @@ function ManageCoursePage(props){
         }));
     }
 
-    function handleSave(event){
+    function handleSave(event){        
         event.preventDefault();
+        if (!formIsValid()) return;
+        setSaving(true);
         props.saveCourse(course).then(() => {
+                toast.success('Course saved.');
                 props.history.push('/courses');
-            }
-        );
+            }).catch(error => {
+                setSaving(false);
+                setErrors({ onSave: error.message });
+            });
     }
 
 
     return (
-        <CourseForm 
+        props.authors.length === 0 || props.courses.length === 0
+        ? (<Spinner/>)
+        : (<CourseForm 
             course={course} 
-            errors={errors} 
+            errors={errors}
             authors={props.authors} 
             onChange={handleChange}
             onSave={handleSave}
-        />
+            saving={saving}
+        />)
     );
 }
 
