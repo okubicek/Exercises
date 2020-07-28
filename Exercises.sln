@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DIContainer", "NetCore\DIContainer\DIContainer.csproj", "{2E783FA0-D2FD-48F8-823C-1C123AD2FA6C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miscellaneous", "NetCore\Miscellaneous\Miscellaneous.csproj", "{ADD857C2-26B1-49D1-950C-37323C097338}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2E783FA0-D2FD-48F8-823C-1C123AD2FA6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E783FA0-D2FD-48F8-823C-1C123AD2FA6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E783FA0-D2FD-48F8-823C-1C123AD2FA6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADD857C2-26B1-49D1-950C-37323C097338}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADD857C2-26B1-49D1-950C-37323C097338}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADD857C2-26B1-49D1-950C-37323C097338}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADD857C2-26B1-49D1-950C-37323C097338}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6EFC6285-D51D-411D-841D-43D1790BDFE4}
+	EndGlobalSection
+EndGlobal
