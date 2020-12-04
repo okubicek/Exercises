@@ -11,7 +11,7 @@ namespace Aoc
 			var puzzle = Assembly.GetCallingAssembly()
 				.GetTypes()
 				.SingleOrDefault(
-					x => x.Namespace.Contains($"Year{aocYear}") && 
+					x => x.Namespace != null && x.Namespace.Contains($"Year{aocYear}") && 
 					GetAocDayAttributeValue(x) == day &&
 					typeof(IPuzzleSolver).IsAssignableFrom(x)
 				);
