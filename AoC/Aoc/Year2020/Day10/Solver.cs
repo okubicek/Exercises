@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Aoc.Year2020.Day10
 {
@@ -40,22 +37,28 @@ namespace Aoc.Year2020.Day10
 		public string SolveSecondTask()
 		{
 			long variants = 1;
-			var previousNode = 0;
+			var previousNode = -1;
 
 			foreach(int i in _diffList[2])
 			{
-				variants *= GetSubVariants(_joltages.GetRange(previousNode, i - previousNode), _joltages[i]);
+				variants *= GetSubVariants(_joltages.GetRange(previousNode + 2, i - (previousNode + 1)), _joltages[previousNode + 1]);
+				previousNode = i;
 			};
 
 			return $"{variants}";
 		}
 
-		private int GetSubVariants(List<int> lists, int value)
+		private int GetSubVariants(List<int> joltages, int joltage)
 		{
-			var subVariantCount = 0;
-			foreach (var item in lists.Where(x => x < (value + 3)))
+			if (joltages.Count < 2)
 			{
-				subVariantCount += GetSubVariants(lists.GetRange(1, lists.Count - 1), item);
+				return 1;
+			}
+
+			var subVariantCount = 0;
+			for(var i = 0; i < joltages.Count && joltages[i] <= (joltage + 3); i++)			
+			{
+				subVariantCount += GetSubVariants(joltages.GetRange(i + 1, joltages.Count - (i + 1)), joltages[i]);
 			}
 
 			return subVariantCount;
