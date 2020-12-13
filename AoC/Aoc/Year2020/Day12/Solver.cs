@@ -35,8 +35,7 @@ namespace Aoc.Year2020.Day12
 		public string SolveSecondTask()
 		{
 			var waypoint = new Point(10, 1);
-			var currentPosition = new Point(0, 0);
-			var currentDirection = 'E';
+			var currentPosition = new Point(0, 0);			
 
 			foreach (var instruction in _input)
 			{
@@ -55,7 +54,7 @@ namespace Aoc.Year2020.Day12
 						break;
 					case 'R':
 					case 'L':
-						(currentDirection, waypoint) = RotateWaypoint(instruction[0], instructionValue, currentDirection, waypoint);
+						waypoint = RotateWaypoint(instruction[0], instructionValue, waypoint);
 						break;
 				}
 			}
@@ -63,20 +62,24 @@ namespace Aoc.Year2020.Day12
 			return $"{Math.Abs(currentPosition.X) + Math.Abs(currentPosition.Y)}";
 		}
 
-		private (char, Point) RotateWaypoint(char instruction, int instructionValue, char currentDirection, Point waypoint)
+		private Point RotateWaypoint(char instruction, int instructionValue, Point waypoint)
 		{
 			//1st quadrant = E, 2nd quadrant = S, 3rd quadrant = W, 4th quadrant = N
-			var rotationDiff = new Dictionary<char, Point> { { 'E', new Point(1, 1) }, { 'S', new Point(1, -1) }, { 'W', new Point(-1, -1) }, { 'N', new Point(-1, 1) } };			
+			var rotationDiff = new Dictionary<char, Point> { { 'E', new Point(1, 1) }, { 'S', new Point(1, -1) }, { 'W', new Point(-1, -1) }, { 'N', new Point(-1, 1) } };						
 
 			for (int i = 0; i < instructionValue/90; i++)
 			{
-				currentDirection = Turn(instruction, instructionValue, currentDirection);
-				var coordinageChange = rotationDiff[currentDirection];
+				var currentQuadrant = waypoint.X > 0 && waypoint.Y >= 0 ? 'E' :
+				waypoint.X >= 0 && waypoint.Y < 0 ? 'S' :
+				waypoint.X < 0 && waypoint.Y <= 0 ? 'W' : 'N';
+
+				var nextQuadrant = Turn(instruction, 90, currentQuadrant);
+				var coordinageChange = rotationDiff[nextQuadrant];
 
 				waypoint = new Point(Math.Abs(waypoint.Y) * coordinageChange.X, Math.Abs(waypoint.X) * coordinageChange.Y);
 			}
 
-			return (currentDirection, waypoint);
+			return waypoint;
 		}
 
 		public (char, Point) ExecuteInstruction(string instruction, Point currentPosition, char facingDirection)
