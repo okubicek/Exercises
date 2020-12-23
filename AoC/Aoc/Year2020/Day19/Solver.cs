@@ -72,10 +72,10 @@ namespace Aoc.Year2020.Day19
 				return (false, index);
 			}
 
-			private (bool isValid, int index) EvaluateRuleSet(string toValidate, int index, int i)
+			private (bool isValid, int index) EvaluateRuleSet(string toValidate, int index, int ruleSetId)
 			{
 				var tempIndex = index;
-				foreach (var ruleId in _ruleSets[i])
+				foreach (var ruleId in _ruleSets[ruleSetId])
 				{
 					var res = _ruleBook[ruleId].Matches(toValidate, tempIndex);
 					if (!res.isValid)
