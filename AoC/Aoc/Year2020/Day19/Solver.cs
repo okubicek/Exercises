@@ -8,7 +8,7 @@ namespace Aoc.Year2020.Day19
 	{
 		private interface IRule
 		{
-			(bool isValid, int index) Matches(string toValidate, int index);
+			(bool isValid, List<string> validCombinations) Matches(string toValidate, List<string> possibleCombinations);
 		}
 
 		private class FixedCharacterRule : IRule
@@ -20,9 +20,12 @@ namespace Aoc.Year2020.Day19
 
 			private char _character;
 
-			public (bool isValid, int index) Matches(string toValidate, int index)
+			public (bool isValid, List<string> validCombinations) Matches(string toValidate, List<string> possibleCombinations)
 			{
-				return index < toValidate.Length ? (_character == toValidate[index], index + 1) : (false, index);
+				var add = possibleCombinations.Select(x => x + _character);
+				var validCombinations = add.Where(a => toValidate.StartsWith(a)).ToList();
+
+				return (validCombinations.Any(), validCombinations);
 			}
 		}
 
@@ -58,38 +61,39 @@ namespace Aoc.Year2020.Day19
 				_ruleSets.Add(set);
 			}
 
-			public (bool isValid, int index) Matches(string toValidate, int index)
-			{				
+			public (bool isValid, List<string> validCombinations) Matches(string toValidate, List<string> possibleCombinations)
+			
+			{
+				var validCombinations = new List<string>();
 				for (var i = 0; i < _ruleSets.Count; i++)
 				{
-					var res = EvaluateRuleSet(toValidate, index, i);
+					var res = EvaluateRuleSet(toValidate, possibleCombinations, i);
 					if (res.isValid)
 					{
-						return (true, res.index);
+						validCombinations.AddRange(res.validCombinations);
 					}
 				}
 
-				return (false, index);
+				return (validCombinations.Any(), validCombinations);
 			}
 
-			private (bool isValid, int index) EvaluateRuleSet(string toValidate, int index, int ruleSetId)
+			private (bool isValid, List<string> validCombinations) EvaluateRuleSet(string toValidate, List<string> possibleCombinations, int ruleSetId)
 			{
-				var tempIndex = index;
+				var tempIndex = possibleCombinations;
 				foreach (var ruleId in _ruleSets[ruleSetId])
 				{
 					var res = _ruleBook[ruleId].Matches(toValidate, tempIndex);
 					if (!res.isValid)
 					{
-						return (false, res.index);
+						return (false, null);
 					}
 
-					tempIndex = res.index;
+					tempIndex = res.validCombinations;
 				}
 
 				return (true, tempIndex);
 			}
 		}
-
 
 		private const int Day = 19;		
 
@@ -124,36 +128,35 @@ namespace Aoc.Year2020.Day19
 
 		public string SolveFirstTask()
 		{
-			int validOnes = 0;
-			foreach(var message in _messages)
-			{
-				var res = _ruleBook[0].Matches(message, 0);
-
-				if (res.isValid && res.index == message.Length)
-				{
-					validOnes++;
-				}
-			}
+			int validOnes = Solve();
 
 			return $"{validOnes}";
 		}
 
 		public string SolveSecondTask()
 		{
-			int validOnes = 0;
 			_ruleBook[8] = new PositionRule("42 | 42 8", _ruleBook);
 			_ruleBook[11] = new PositionRule("42 31 | 42 11 31", _ruleBook);
+
+			int validOnes = Solve();
+
+			return $"{validOnes}";
+		}
+
+		private int Solve()
+		{
+			int validOnes = 0;
 			foreach (var message in _messages)
 			{
-				var res = _ruleBook[0].Matches(message, 0);
+				var res = _ruleBook[0].Matches(message, new List<string> { string.Empty });
 
-				if (res.isValid && res.index == message.Length)
+				if (res.isValid && res.validCombinations.Any(x => x.Length == message.Length))
 				{
 					validOnes++;
 				}
 			}
 
-			return $"{validOnes}";
+			return validOnes;
 		}
 	}
 }
