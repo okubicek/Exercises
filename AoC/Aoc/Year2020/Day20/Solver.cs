@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Text;
 
 namespace Aoc.Year2020.Day20
 {
@@ -12,6 +14,10 @@ namespace Aoc.Year2020.Day20
 
 		private Dictionary<string, List<int>> _sides = new Dictionary<string, List<int>>();
 
+		private List<Point> _seaMonsterPattern = new List<Point> { new Point(0,0), new Point(1,1), new Point(5, 1), new Point(6, 1), new Point(11, 1), new Point(12, 1), new Point(17, 1), new Point(18, 1), new Point(19,1),
+			new Point(4,1), new Point(7,1), new Point(10,1), new Point(13,1), new Point(16,1), new Point(18,-1)
+		};
+
 		private class Image
 		{
 			public Image(int id)
@@ -20,7 +26,7 @@ namespace Aoc.Year2020.Day20
 			}
 
 			public int Id { get; }
-			public List<string> Content { get; } = new List<string>();
+			public List<string> Content { get; private set; } = new List<string>();
 
 			public List<string> GetSidesWithInversion()
 			{
@@ -28,6 +34,30 @@ namespace Aoc.Year2020.Day20
 				sides.AddRange(sides.Select(x => string.Join(string.Empty, x.Reverse())).ToList());
 
 				return sides;
+			}
+
+			public void Invert()
+			{
+				for (int i = 0; i < Content.Count; i++)
+				{
+					Content[i] = string.Join(string.Empty, Content[i].Reverse());
+				}
+			}
+
+			public void Rotate()
+			{
+				var newContent = new List<string>();
+				for (int i = Content[0].Length - 1; i >= 0; i--)
+				{
+					var builder = new StringBuilder();
+					for(int j = 0; j < Content.Count; j++)
+					{
+						builder.Append(Content[j][i]);
+					}
+					newContent.Add(builder.ToString());
+				}
+
+				Content = newContent;
 			}
 
 			public List<string> GetSides()
@@ -80,8 +110,53 @@ namespace Aoc.Year2020.Day20
 		}
 
 		public string SolveSecondTask()
-		{			
-			return $"";
+		{
+			var map = new Image(0);
+			map.Content.AddRange(GenerateMap(null));
+			var res = string.Empty;
+
+			for (int i = 0; i < 4; i++)
+			{
+				var monsterCount = 0;
+				for (int y = 1; y < map.Content.Count - 1; y++)
+				{
+					for (int x = 0; x < map.Content[0].Length - 20; x++)
+					{
+						if (_seaMonsterPattern.All(m => map.Content[y + m.Y][x + m.X] == '#'))
+						{
+							monsterCount++;
+						}
+					}
+				}
+
+				map.Rotate();
+				res += $"{monsterCount}-";
+			}
+
+			return res;
 		}
+
+		public List<string> GenerateMap(List<List<int>> tilePositions)
+		{
+			var map = new List<string>();
+
+			foreach (var tileLine in tilePositions)
+			{
+				var tiles = _images.Where(i => tileLine.Contains(i.Id));
+
+				for(int i = 1; i < tiles.First().Content[0].Length - 1; i++)
+				{
+					var mapLine = string.Empty;
+					foreach(var tile in tiles)
+					{
+						map.Add(tile.Content[i].Substring(1, tile.Content[i].Length - 2));
+					}
+
+					map.Add(mapLine);
+				}
+			}
+
+			return map;
+		}		
 	}
 }
