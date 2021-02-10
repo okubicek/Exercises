@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -14,8 +15,8 @@ namespace Aoc.Year2020.Day20
 
 		private Dictionary<string, List<int>> _sides = new Dictionary<string, List<int>>();
 
-		private List<Point> _seaMonsterPattern = new List<Point> { new Point(0,0), new Point(1,1), new Point(5, 1), new Point(6, 1), new Point(11, 1), new Point(12, 1), new Point(17, 1), new Point(18, 1), new Point(19,1),
-			new Point(4,1), new Point(7,1), new Point(10,1), new Point(13,1), new Point(16,1), new Point(18,-1)
+		private List<Point> _seaMonsterPattern = new List<Point> { new Point(0,0), new Point(5, 0), new Point(6, 0), new Point(11, 0), new Point(12, 0), new Point(17, 0), new Point(18, 0), new Point(19,0),
+			new Point(1,1), new Point(4,1), new Point(7,1), new Point(10,1), new Point(13,1), new Point(16,1), new Point(18,-1)
 		};
 
 		private class Image
@@ -27,6 +28,15 @@ namespace Aoc.Year2020.Day20
 
 			public int Id { get; }
 			public List<string> Content { get; private set; } = new List<string>();
+
+			public string RightSide => string.Join(string.Empty, Content.Select(x => x[x.Length - 1]));
+
+			public string LeftSide => string.Join(string.Empty, Content.Select(x => x[0]));
+
+			public string TopSide => Content.First();
+
+			public string BottomSide => Content.Last();
+
 
 			public List<string> GetSidesWithInversion()
 			{
@@ -63,12 +73,22 @@ namespace Aoc.Year2020.Day20
 			public List<string> GetSides()
 			{
 				var sides = new List<string>();
-				sides.Add(Content.First());
-				sides.Add(Content.Last());
-				sides.Add(string.Join(string.Empty, Content.Select(x => x[0])));
-				sides.Add(string.Join(string.Empty, Content.Select(x => x[x.Length - 1])));
+				sides.Add(TopSide);
+				sides.Add(BottomSide);
+				sides.Add(LeftSide);
+				sides.Add(RightSide);
 
 				return sides;
+			}
+
+			public void PrintMe()
+			{
+				foreach(var line in Content)
+				{
+					Console.WriteLine(line);
+				}
+
+				Console.WriteLine();
 			}
 		}
 
@@ -104,23 +124,81 @@ namespace Aoc.Year2020.Day20
 
 		public string SolveFirstTask()
 		{
-			var uniqueSides = _sides.Where(x => x.Value.Count() == 1).ToList();
-			var keys = uniqueSides.SelectMany(s => s.Value).GroupBy(i => i).Where(i => i.Count() == 4).Select(x => x.Key).Distinct().ToList();
+			List<int> keys = GetCornerTiles();
 			return $"{(long)keys[0] * keys[1] * keys[2] * keys[3]}";
+		}
+
+		private List<int> GetCornerTiles()
+		{
+			var sidesWithNoNeighbours = _sides.Where(x => x.Value.Count() == 1).ToList();
+			var keys = sidesWithNoNeighbours.SelectMany(s => s.Value).GroupBy(i => i).Where(i => i.Count() == 4).Select(x => x.Key).Distinct().ToList();//4x times there instead of just 2x times because of inversions
+			return keys;
 		}
 
 		public string SolveSecondTask()
 		{
-			var map = new Image(0);
-			map.Content.AddRange(GenerateMap(null));
-			var res = string.Empty;
+			var cornerTiles = GetCornerTiles();
+			var topLeftCornerTile = _images.Where(i => i.Id == cornerTiles.First()).First();
+			cornerTiles.Remove(cornerTiles.First());
+			var tilePositions = new List<List<int>>();
 
+			while (true)
+			{
+				if (_sides[topLeftCornerTile.LeftSide].Count() == 1 && _sides[topLeftCornerTile.TopSide].Count() == 1) break;
+
+				topLeftCornerTile.Rotate();
+			}
+
+			Image yPositionTile, xPositionTile = yPositionTile = topLeftCornerTile;
+			var x = 0;
+			var y = 0;
+			while (true)
+			{
+				tilePositions.Add(new List<int>());
+				while (true)
+				{
+					tilePositions[y].Add(xPositionTile.Id);
+
+					xPositionTile = FindConnectingTileInAxis(xPositionTile, 'X');
+					if (xPositionTile == null) break;
+
+					x++;
+				}
+
+				yPositionTile = xPositionTile = FindConnectingTileInAxis(yPositionTile, 'Y'); //starting first column of next line
+				if (yPositionTile == null) break;
+
+				y++;
+				x = 0;
+			}
+
+			var map = new Image(0);
+			map.Content.AddRange(GenerateMap(tilePositions));
+			var res = string.Empty;			
+
+			var monsterCount = CountMonstersWithInversion(map);
+
+			return $"{map.Content.SelectMany(m => m).Where(m => m == '#').Count() - (monsterCount * _seaMonsterPattern.Count())}";
+		}
+
+		private int CountMonstersWithInversion(Image map)
+		{
+			var monsterCount = CountMonsters(map);
+			if (monsterCount > 0) return monsterCount;
+
+			map.Invert();
+
+			return CountMonsters(map);
+		}
+
+		private int CountMonsters(Image map)
+		{
 			for (int i = 0; i < 4; i++)
 			{
 				var monsterCount = 0;
-				for (int y = 1; y < map.Content.Count - 1; y++)
+				for (var y = 1; y < map.Content.Count - 1; y++)
 				{
-					for (int x = 0; x < map.Content[0].Length - 20; x++)
+					for (var x = 0; x < map.Content[0].Length - 20; x++)
 					{
 						if (_seaMonsterPattern.All(m => map.Content[y + m.Y][x + m.X] == '#'))
 						{
@@ -129,11 +207,59 @@ namespace Aoc.Year2020.Day20
 					}
 				}
 
+				if (monsterCount > 0) return monsterCount;
+
 				map.Rotate();
-				res += $"{monsterCount}-";
 			}
 
-			return res;
+			return 0;
+		}
+
+		private Image FindConnectingTileInAxis(Image tile, char axis)
+		{
+			var connectingSide = axis == 'X' ? tile.RightSide : tile.BottomSide;
+			Func<Image, bool> imageSidePicker = axis == 'X' 
+				? (image) => image.LeftSide == connectingSide 
+				: (image) => image.TopSide == connectingSide;
+
+			var connectingImage = GetConnectingImage(tile, connectingSide);
+
+			if (connectingImage == null) return null;
+
+			RotateToPosition(connectingImage, imageSidePicker);
+
+			return connectingImage;			
+		}
+
+		private Image GetConnectingImage(Image tile, string side)
+		{
+			var connectingTile = _sides[side].Where(tileId => tileId != tile.Id).Distinct().FirstOrDefault();
+
+			return _images.FirstOrDefault(i => i.Id == connectingTile);
+		}
+
+		private void RotateToPosition(Image image, Func<Image, bool> inPosition)
+		{
+			if (TryAllFourSides(image, inPosition)) return;
+
+			image.Invert();
+
+			if (!TryAllFourSides(image, inPosition)) throw new Exception($"No matching orientationFound for image {image.Id}");
+		}
+
+		private static bool TryAllFourSides(Image image, Func<Image, bool> inPosition)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				if (inPosition(image))
+				{
+					return true;
+				}
+
+				image.Rotate();
+			}
+
+			return false;
 		}
 
 		public List<string> GenerateMap(List<List<int>> tilePositions)
@@ -141,18 +267,17 @@ namespace Aoc.Year2020.Day20
 			var map = new List<string>();
 
 			foreach (var tileLine in tilePositions)
-			{
-				var tiles = _images.Where(i => tileLine.Contains(i.Id));
-
-				for(int i = 1; i < tiles.First().Content[0].Length - 1; i++)
+			{				
+				for(int i = 1; i < _images.First().Content[0].Length - 1; i++)
 				{
-					var mapLine = string.Empty;
-					foreach(var tile in tiles)
+					var mapLine = Enumerable.Empty<char>();
+					foreach(var tileId in tileLine)
 					{
-						map.Add(tile.Content[i].Substring(1, tile.Content[i].Length - 2));
+						var tile = _images.First(i => i.Id == tileId);
+						mapLine = mapLine.Concat(tile.Content[i].Substring(1, tile.Content[i].Length - 2));
 					}
 
-					map.Add(mapLine);
+					map.Add(string.Join(string.Empty, mapLine));
 				}
 			}
 
