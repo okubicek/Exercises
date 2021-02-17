@@ -15,10 +15,10 @@ namespace SerilogProvider
 				.WriteTo.Console()
 				.WriteTo.Debug()
 				.WriteTo.File(
-					formatter: new Serilog.Formatting.Json.JsonFormatter(),
-					"log.txt")
-					//formatter: new RenderedCompactJsonFormatter()) 		
-				//outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{Exception}{NewLine}{Properties}{NewLine}")
+					//formatter: new Serilog.Formatting.Json.JsonFormatter(),
+					//formatter: new RenderedCompactJsonFormatter(),
+					"log.txt",					 		
+					outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{Exception}{NewLine}{Properties:j}{NewLine}")
 				.CreateLogger();
 			
 			CreateHostBuilder(args).Build().Run();
