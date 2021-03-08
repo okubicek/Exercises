@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace RayTracing{
+namespace RayTracing {
     public class PpmHeader
     {
         public PpmHeader(int width, int height)
